@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#081524" />
+    <title>Sentinel · Network Intrusion Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="/" aria-label="Sentinel home">
+          <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5 27 8v7.4c0 6.2-4.3 11.4-11 13.1C9.3 26.8 5 21.6 5 15.4V8l11-4.5Z"/><path d="m11.5 15.8 3 3 6.3-6.6"/></svg></span>
+          <span class="brand-name">sentinel<span class="brand-dot">.</span><small>NETWORK INTELLIGENCE</small></span>
+        </a>
+        <div class="sidebar-label">WORKSPACE</div>
+        <nav class="side-nav" aria-label="Workspace navigation">
+          <a class="nav-item active" href="#overview"><span class="nav-icon">◈</span> Overview</a>
+          <a class="nav-item" href="#analyze"><span class="nav-icon">⌁</span> Traffic analysis</a>
+          <a class="nav-item" href="#model"><span class="nav-icon">⌘</span> Model health</a>
+          <a class="nav-item" href="/insights"><span class="nav-icon">▥</span> Model Insights</a>
+        </nav>
+        <div class="sidebar-foot">
+          <div class="local-card"><span class="local-pulse"></span><div><strong>Local environment</strong><small>Your data stays on this device</small></div><span class="lock-icon">⌑</span></div>
+          <div class="sidebar-version">SENTINEL <span>·</span> v1.0</div>
+        </div>
+      </aside>
+
+      <main class="main-content" id="overview">
+        <header class="topbar">
+          <div class="breadcrumb">Workspace <span>/</span> <strong>Overview</strong></div>
+          <div class="topbar-right"><a class="insights-shortcut" href="/insights">Model Insights <span>↗</span></a><span class="system-status"><i></i><span id="system-status-text">Starting model…</span></span><span class="avatar">N</span></div>
+        </header>
+
+        <section class="page-heading">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-line"></span> NETWORK SECURITY</div>
+            <h1>Network intrusion<br class="mobile-break" /> detection</h1>
+            <p>Understand your traffic. Surface suspicious connections. Keep your network one step ahead.</p>
+          </div>
+          <a class="button button-quiet" href="/api/sample.csv" download><span class="download-icon">↓</span> Download sample CSV</a>
+        </section>
+
+        <section class="metrics-grid" aria-label="Model overview">
+          <article class="metric-card metric-accent">
+            <div class="metric-top"><span>HOLDOUT ACCURACY</span><span class="metric-icon accuracy-icon">↗</span></div>
+            <div class="metric-value" id="accuracy-value">—<small>%</small></div>
+            <div class="metric-caption"><span class="mini-check">✓</span> Measured on unseen validation rows</div>
+            <div class="metric-track"><span id="accuracy-track"></span></div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-top"><span>TRAINING CONNECTIONS</span><span class="metric-icon">▦</span></div>
+            <div class="metric-value" id="training-rows">—</div>
+            <div class="metric-caption">Labeled network records used for training</div>
+            <div class="metric-bottom"><span class="metric-dot blue"></span> NSL-KDD traffic dataset</div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-top"><span>CLASSIFIER</span><span class="metric-icon">⌬</span></div>
+            <div class="metric-model" id="model-name">Loading…</div>
+            <div class="metric-caption">Binary classification · normal or anomaly</div>
+            <div class="metric-bottom"><span class="metric-dot green"></span> <span id="feature-count">—</span> traffic features</div>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <article class="panel upload-panel" id="analyze">
+            <div class="panel-heading">
+              <div><div class="eyebrow panel-eyebrow">TRAFFIC ANALYSIS</div><h2>Analyze a traffic file</h2></div>
+              <span class="panel-step">01 <span>/ 01</span></span>
+            </div>
+            <p class="panel-description">Upload a CSV with the network connection features. The model will classify each row and prepare a downloadable report.</p>
+
+            <label class="drop-zone" id="drop-zone" for="file-input">
+              <input id="file-input" type="file" accept=".csv,text/csv" />
+              <span class="upload-symbol"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 26V8m0 0-7 7m7-7 7 7"/><path d="M9 23v8a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2v-8"/></svg></span>
+              <strong id="drop-title">Drop your CSV file here</strong>
+              <span class="drop-subtitle">or <span>browse files</span> on your device</span>
+              <span class="drop-meta">CSV format <i>·</i> up to 25 MB</span>
+            </label>
+            <div class="file-selected" id="file-selected" hidden><span class="file-icon">▤</span><span class="file-name" id="file-name"></span><span class="file-size" id="file-size"></span><button type="button" id="remove-file" aria-label="Remove selected file">×</button></div>
+            <div class="upload-actions">
+              <button class="button button-primary" id="analyze-button" disabled><span class="button-spinner" id="button-spinner"></span><span id="button-label">Analyze traffic</span><span class="button-arrow">→</span></button>
+              <span class="privacy-note"><span class="privacy-shield">⌑</span> Processed locally on your machine</span>
+            </div>
+            <div class="error-message" id="error-message" role="alert" hidden></div>
+          </article>
+
+          <article class="panel model-panel" id="model">
+            <div class="panel-heading">
+              <div><div class="eyebrow panel-eyebrow">MODEL HEALTH</div><h2>Validation snapshot</h2></div>
+              <span class="health-badge"><i></i> HEALTHY</span>
+            </div>
+            <p class="panel-description">Performance measured on a stratified holdout the model did not train on.</p>
+            <div class="score-block">
+              <div class="score-header"><span>Overall accuracy</span><strong id="score-label">—</strong></div>
+              <div class="score-track"><span id="score-track"></span></div>
+              <div class="score-scale"><span>0%</span><span>50%</span><span>100%</span></div>
+            </div>
+            <div class="model-stats">
+              <div><span>Validation rows</span><strong id="validation-rows">—</strong></div>
+              <div><span>Anomaly precision</span><strong id="anomaly-precision">—</strong></div>
+              <div><span>Anomaly recall</span><strong id="anomaly-recall">—</strong></div>
+            </div>
+            <div class="model-note"><span class="note-icon">i</span><span>Accuracy is calculated on a 20% holdout split. Results on new traffic can vary with the data source.</span></div>
+          </article>
+        </section>
+
+        <section class="results-section" id="results-section" hidden>
+          <div class="results-heading"><div><div class="eyebrow panel-eyebrow">ANALYSIS COMPLETE</div><h2>Traffic report</h2></div><a class="button button-primary button-download" id="download-results" href="#" download><span>↓</span> Download full report</a></div>
+          <div class="result-cards">
+            <div class="result-card"><span class="result-label">ROWS ANALYZED</span><strong id="result-total">0</strong></div>
+            <div class="result-card result-normal"><span class="result-label">NORMAL TRAFFIC</span><strong id="result-normal">0</strong><div class="result-meter"><i id="normal-meter"></i></div></div>
+            <div class="result-card result-anomaly"><span class="result-label">ANOMALIES DETECTED</span><strong id="result-anomaly">0</strong><div class="result-meter"><i id="anomaly-meter"></i></div></div>
+            <div class="result-card" id="upload-accuracy-card" hidden><span class="result-label">LABELED FILE ACCURACY</span><strong id="upload-accuracy">—</strong><small>Compared with the CSV class column</small></div>
+          </div>
+          <div class="table-panel"><div class="table-heading"><div><h3>Prediction preview</h3><p>First 12 connection rows</p></div><span class="table-tag">LIVE RESULTS</span></div><div class="table-scroll"><table><thead id="preview-head"></thead><tbody id="preview-body"></tbody></table></div></div>
+        </section>
+
+        <footer class="page-footer"><span>Sentinel Network Intelligence</span><span>Machine learning assisted traffic review <i>·</i> Runs locally</span></footer>
+      </main>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </body>
+</html>
